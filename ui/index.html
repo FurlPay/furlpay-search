@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FurlPay Search — Real-Time Progressive Retrieval Runtime</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0c10;
+      --bg-card: #12151c;
+      --bg-elevated: #1a1e28;
+      --bg-input: #151923;
+      --border-subtle: #232838;
+      --border-active: #3b82f6;
+      --text-primary: #f0f3f8;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent-blue: #3b82f6;
+      --accent-cyan: #06b6d4;
+      --accent-green: #10b981;
+      --accent-purple: #8b5cf6;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1100px;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .gem {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #fff;
+      font-size: 16px;
+      letter-spacing: -0.5px;
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+    }
+    .title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .sub {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .live-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--accent-green);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 9999px;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      box-shadow: 0 0 8px var(--accent-green);
+      animation: pulse 1.5s infinite;
+    }
+
+    /* Mode Selector */
+    .mode-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .mode-tab {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .mode-tab:hover {
+      color: var(--text-primary);
+      border-color: var(--border-active);
+    }
+    .mode-tab.active {
+      background: rgba(59, 130, 246, 0.15);
+      border-color: var(--accent-blue);
+      color: #93c5fd;
+    }
+
+    /* Search Box */
+    .search-wrapper {
+      margin-bottom: 24px;
+      position: relative;
+    }
+    .search-bar {
+      display: flex;
+      align-items: center;
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 10px 16px;
+      gap: 12px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+      position: relative;
+    }
+    .search-bar:focus-within {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+    }
+    .search-icon {
+      color: var(--text-muted);
+      flex-shrink: 0;
+      transition: color 0.15s ease;
+    }
+    .search-bar:focus-within .search-icon {
+      color: var(--accent-blue);
+    }
+
+    /* Input Field */
+    .search-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-primary);
+      font-size: 16px;
+      font-family: inherit;
+      caret-color: var(--accent-blue);
+    }
+
+    /* Clear Button */
+    .clear-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 16px;
+      padding: 4px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      transition: all 0.15s ease;
+    }
+    .clear-btn:hover {
+      color: var(--text-primary);
+      background: var(--bg-elevated);
+    }
+    .clear-btn.visible {
+      display: flex;
+    }
+
+    /* Submit Arrow Button */
+    .submit-arrow {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+    .submit-arrow.active {
+      background: var(--accent-blue);
+      border-color: var(--accent-blue);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+    }
+    .submit-arrow.active:hover {
+      background: #2563eb;
+      transform: translateX(2px);
+    }
+    .submit-arrow.active:active {
+      transform: scale(0.95);
+    }
+
+    /* Status Badge & Animated Loaders */
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 8px;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+    .status-badge.idle {
+      background: var(--bg-elevated);
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
+    }
+    .status-badge.working {
+      background: rgba(16, 185, 129, 0.12);
+      color: #6ee7b7;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .status-badge.ready {
+      background: rgba(59, 130, 246, 0.12);
+      color: #93c5fd;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+    .status-badge.empty {
+      background: rgba(245, 158, 11, 0.12);
+      color: #fcd34d;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .status-badge.error {
+      background: rgba(244, 63, 94, 0.12);
+      color: #fda4af;
+      border: 1px solid rgba(244, 63, 94, 0.3);
+    }
+
+    /* Animated Rounded-Square Loader (A) */
+    .square-loader {
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(16, 185, 129, 0.3);
+      border-top-color: var(--accent-green);
+      border-radius: 4px;
+      animation: spinSquare 0.9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      flex-shrink: 0;
+    }
+
+    /* Three-Dot Loader (B) */
+    .dots-loader {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      margin-left: 2px;
+    }
+    .dots-loader span {
+      width: 4px;
+      height: 4px;
+      background-color: currentColor;
+      border-radius: 50%;
+      animation: dotPulse 1.2s infinite ease-in-out;
+    }
+    .dots-loader span:nth-child(1) { animation-delay: 0s; }
+    .dots-loader span:nth-child(2) { animation-delay: 0.2s; }
+    .dots-loader span:nth-child(3) { animation-delay: 0.4s; }
+
+    /* Entity Tag Pill */
+    .entity-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      margin-left: 8px;
+    }
+    .entity-tag.tron {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .entity-tag.ethereum {
+      background: rgba(139, 92, 246, 0.15);
+      color: #c4b5fd;
+      border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+    .entity-tag.solana {
+      background: rgba(6, 182, 212, 0.15);
+      color: #67e8f9;
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+    .entity-tag.bitcoin {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fcd34d;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .entity-tag.token {
+      background: rgba(59, 130, 246, 0.15);
+      color: #93c5fd;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .loading-caption {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+      padding-left: 16px;
+      font-family: var(--font-mono);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Grid Layout */
+    .grid {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 24px;
+    }
+
+    /* Pipeline Card */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 24px;
+    }
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+    .engine-pill {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      background: var(--bg-elevated);
+      color: var(--accent-cyan);
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    /* Steps List */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .step {
+      display: flex;
+      gap: 12px;
+      position: relative;
+    }
+    .step-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .step-bubble {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+    .step.done .step-bubble {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+    }
+    .step.working .step-bubble {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: var(--accent-blue);
+      color: var(--accent-blue);
+      animation: pulse 1.2s infinite;
+    }
+    .step-line {
+      width: 2px;
+      height: calc(100% + 4px);
+      background: var(--border-subtle);
+      margin-top: 4px;
+    }
+    .step.done .step-line {
+      background: rgba(16, 185, 129, 0.3);
+    }
+    .step-body {
+      padding-top: 3px;
+    }
+    .step-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .step-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    /* Telemetry Bar */
+    .telem-bar {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+    .telem-val {
+      color: var(--accent-cyan);
+      font-weight: 600;
+    }
+
+    /* Results Column */
+    .stream-pill {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--accent-green);
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    .result-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-height: 680px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .result-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 16px;
+      transition: all 0.2s ease;
+      animation: fadeIn 0.25s ease-out forwards;
+    }
+    .result-card:hover {
+      border-color: rgba(59, 130, 246, 0.4);
+      transform: translateY(-1px);
+    }
+    .res-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .file-ref {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: #93c5fd;
+      font-weight: 500;
+    }
+    .badge-group {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .layer-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      background: var(--bg-card);
+      color: var(--accent-cyan);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--border-subtle);
+    }
+    .score-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--accent-green);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    .res-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .code-block {
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 12px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #cbd5e1;
+      overflow-x: auto;
+      line-height: 1.5;
+      margin-bottom: 8px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .code-block mark {
+      background: rgba(59, 130, 246, 0.35);
+      color: #ffffff;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    .res-foot {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 48px 16px;
+      color: var(--text-muted);
+    }
+    .empty-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+
+    /* Keyframes */
+    @keyframes spinSquare {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes dotPulse {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.3; }
+      40% { transform: translateY(-3px); opacity: 1; }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+      .square-loader, .dots-loader span, .dot, .result-card {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="brand">
+        <div class="gem">FP</div>
+        <div>
+          <h1 class="title">FurlPay Search</h1>
+          <p class="sub">Sub-millisecond AI agent retrieval runtime</p>
+        </div>
+      </div>
+      <div class="live-pill">
+        <span class="dot"></span>
+        Live search
+      </div>
+    </header>
+
+    <!-- Search Modes -->
+    <div class="mode-tabs">
+      <button class="mode-tab active" data-mode="global">Global Web</button>
+      <button class="mode-tab" data-mode="code">Local Code</button>
+      <button class="mode-tab" data-mode="deep">Deep Research</button>
+      <button class="mode-tab" data-mode="url">Direct URL</button>
+      <button class="mode-tab" data-mode="hybrid">Hybrid</button>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-wrapper">
+      <div class="search-bar">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input 
+          type="text" 
+          id="searchInput" 
+          class="search-input" 
+          placeholder="Search anything globally... questions, topics, TRON wallet, code, research, identifiers"
+          autocomplete="off"
+          spellcheck="false"
+          autofocus
+        >
+        <button id="clearBtn" class="clear-btn" title="Clear search">✕</button>
+        <button id="submitBtn" class="submit-arrow" title="Execute search (Enter)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+        <div id="statusBadge" class="status-badge idle">
+          <span>Search your codebase…</span>
+        </div>
+      </div>
+      <div id="loadingCaption" class="loading-caption">
+        <span id="captionText">Type a symbol, blockchain address or token to search live</span>
+        <span id="entityTagSlot"></span>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- Steps Column -->
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">Search Pipeline</h2>
+          <span class="engine-tag engine-pill">Rust furlpayd</span>
+        </div>
+        <div class="steps">
+          <div id="step1" class="step">
+            <div class="step-col">
+              <div class="step-bubble">1</div>
+              <div class="step-line"></div>
+            </div>
+            <div class="step-body">
+              <div class="step-title">1. Query classification</div>
+              <p class="step-desc" id="step1Desc">Determine exact, regex, symbol, blockchain, or hybrid search.</p>
+            </div>
+          </div>
+
+          <div id="step2" class="step">
+            <div class="step-col">
+              <div class="step-bubble">2</div>
+              <div class="step-line"></div>
+            </div>
+            <div class="step-body">
+              <div class="step-title">2. Parallel retrieval</div>
+              <p class="step-desc" id="step2Desc">Search trigram, prefix, AST and symbol indexes.</p>
+            </div>
+          </div>
+
+          <div id="step3" class="step">
+            <div class="step-col">
+              <div class="step-bubble">3</div>
+              <div class="step-line"></div>
+            </div>
+            <div class="step-body">
+              <div class="step-title">3. Verification &amp; ranking</div>
+              <p class="step-desc" id="step3Desc">Verify candidate matches and apply RRF ranking.</p>
+            </div>
+          </div>
+
+          <div id="step4" class="step">
+            <div class="step-col">
+              <div class="step-bubble">4</div>
+            </div>
+            <div class="step-body">
+              <div class="step-title">4. Progressive streaming</div>
+              <p class="step-desc" id="step4Desc">Stream verified results immediately as they arrive.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="telem-bar">
+          <div>TTFV: <span id="ttfvVal" class="telem-val">—</span></div>
+          <div>Total: <span id="totalVal" class="telem-val">—</span></div>
+          <div>Hits: <span id="hitsVal" class="telem-val">0</span></div>
+        </div>
+      </div>
+
+      <!-- Results Column -->
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">Verified Results</h2>
+          <span id="streamPill" class="stream-pill">Progressive stream idle</span>
+        </div>
+        <div id="resultsList" class="result-list">
+          <div class="empty-state">
+            <div class="empty-icon">🔍</div>
+            <p>Start typing to search in real time.</p>
+            <p style="font-size: 12px; margin-top: 4px; color: var(--text-muted);">Try: <code>t</code>, <code>tron</code>, <code>TRX</code>, <code>TokenValidator</code>, or paste an address.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State
+    let activeMode = 'global';
+    let debounceTimer = null;
+    let activeAbortController = null;
+    let activeRequestId = 0;
+    let firstVerifiedTime = null;
+
+    // Elements
+    const searchInput = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('clearBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const statusBadge = document.getElementById('statusBadge');
+    const captionText = document.getElementById('captionText');
+    const entityTagSlot = document.getElementById('entityTagSlot');
+    const resultsList = document.getElementById('resultsList');
+    const streamPill = document.getElementById('streamPill');
+    const ttfvVal = document.getElementById('ttfvVal');
+    const totalVal = document.getElementById('totalVal');
+    const hitsVal = document.getElementById('hitsVal');
+    const modeTabs = document.querySelectorAll('.mode-tab');
+
+    // Mode switching
+    modeTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        modeTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        activeMode = tab.dataset.mode;
+        if (searchInput.value.trim()) {
+          triggerSearch(searchInput.value.trim(), true);
+        }
+      });
+    });
+
+    // Input listener (Debounced live search)
+    searchInput.addEventListener('input', (e) => {
+      const val = e.target.value;
+      if (val.length > 0) {
+        clearBtn.classList.add('visible');
+        submitBtn.classList.add('active');
+      } else {
+        clearBtn.classList.remove('visible');
+        submitBtn.classList.remove('active');
+      }
+
+      clearTimeout(debounceTimer);
+      const query = val.trim();
+      if (!query) {
+        cancelActiveSearch();
+        resetToIdle();
+        return;
+      }
+
+      // Show immediate typing feedback
+      showWorkingStatus('Working…');
+
+      // Debounce live search ~280ms
+      debounceTimer = setTimeout(() => {
+        triggerSearch(query, false);
+      }, 280);
+    });
+
+    // Enter key submits immediately
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        clearTimeout(debounceTimer);
+        const query = searchInput.value.trim();
+        if (query) {
+          triggerSearch(query, true);
+        }
+      }
+    });
+
+    // Submit button click
+    submitBtn.addEventListener('click', () => {
+      clearTimeout(debounceTimer);
+      const query = searchInput.value.trim();
+      if (query) {
+        triggerSearch(query, true);
+      }
+    });
+
+    // Clear button click
+    clearBtn.addEventListener('click', () => {
+      clearTimeout(debounceTimer);
+      cancelActiveSearch();
+      searchInput.value = '';
+      clearBtn.classList.remove('visible');
+      submitBtn.classList.remove('active');
+      resetToIdle();
+      searchInput.focus();
+    });
+
+    function cancelActiveSearch() {
+      if (activeAbortController) {
+        activeAbortController.abort();
+        activeAbortController = null;
+      }
+    }
+
+    function resetToIdle() {
+      statusBadge.className = 'status-badge idle';
+      statusBadge.innerHTML = '<span>Search your codebase…</span>';
+      captionText.innerText = 'Type a symbol, blockchain address or token to search live';
+      entityTagSlot.innerHTML = '';
+      streamPill.innerText = 'Progressive stream idle';
+      streamPill.style.color = 'var(--text-muted)';
+      streamPill.style.borderColor = 'var(--border-subtle)';
+      resetSteps();
+      resultsList.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">🔍</div>
+          <p>Start typing to search in real time.</p>
+          <p style="font-size: 12px; margin-top: 4px; color: var(--text-muted);">Try: <code>t</code>, <code>tron</code>, <code>TRX</code>, <code>TokenValidator</code>, or paste an address.</p>
+        </div>
+      `;
+      ttfvVal.innerText = '—';
+      totalVal.innerText = '—';
+      hitsVal.innerText = '0';
+    }
+
+    function resetSteps() {
+      for (let i = 1; i <= 4; i++) {
+        const step = document.getElementById('step' + i);
+        step.className = 'step';
+        step.querySelector('.step-bubble').innerText = i;
+      }
+      document.getElementById('step1Desc').innerText = 'Determine exact, regex, symbol, blockchain, or hybrid search.';
+      document.getElementById('step2Desc').innerText = 'Search trigram, prefix, AST and symbol indexes.';
+      document.getElementById('step3Desc').innerText = 'Verify candidate matches and apply RRF ranking.';
+      document.getElementById('step4Desc').innerText = 'Stream verified results immediately as they arrive.';
+    }
+
+    function showWorkingStatus(msg) {
+      statusBadge.className = 'status-badge working';
+      statusBadge.innerHTML = `
+        <div class="square-loader"></div>
+        <span>${msg}</span>
+        <div class="dots-loader"><span></span><span></span><span></span></div>
+      `;
+    }
+
+    async function triggerSearch(query, isImmediate) {
+      cancelActiveSearch();
+      const requestId = ++activeRequestId;
+      const controller = new AbortController();
+      activeAbortController = controller;
+
+      firstVerifiedTime = null;
+      showWorkingStatus('Working…');
+      streamPill.innerText = 'Progressive stream active';
+      streamPill.style.color = 'var(--accent-green)';
+      streamPill.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+
+      // Mark Step 1 in progress
+      resetSteps();
+      document.getElementById('step1').className = 'step working';
+
+      const resultsMap = new Map();
+      const startTime = performance.now();
+
+      try {
+        const url = `/api/v1/search/stream?q=${encodeURIComponent(query)}&mode=${activeMode}`;
+        const res = await fetch(url, {
+          signal: controller.signal,
+          headers: { 'Accept': 'text/event-stream' }
+        });
+
+        if (!res.ok) {
+          if (res.status === 401) {
+            statusBadge.className = 'status-badge error';
+            statusBadge.innerHTML = '<span>Unauthorized tenant</span>';
+            captionText.innerText = 'Invalid tenant token';
+            return;
+          }
+          throw new Error('HTTP ' + res.status);
+        }
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          if (requestId !== activeRequestId) return; // Stale request guard
+
+          buffer += decoder.decode(value, { stream: true });
+          const messages = buffer.split('\n\n');
+          buffer = messages.pop(); // Retain incomplete chunk
+
+          for (const rawMsg of messages) {
+            if (!rawMsg.trim()) continue;
+            parseAndHandleSseMessage(rawMsg.trim(), query, resultsMap, startTime);
+          }
+        }
+      } catch (err) {
+        if (err.name === 'AbortError') {
+          // Expected cancellation
+          return;
+        }
+        if (requestId !== activeRequestId) return;
+        statusBadge.className = 'status-badge error';
+        statusBadge.innerHTML = '<span>Search failed</span>';
+        captionText.innerText = 'Backend connection error';
+      }
+    }
+
+    function parseAndHandleSseMessage(rawMsg, query, resultsMap, startTime) {
+      const lines = rawMsg.split('\n');
+      let eventType = 'message';
+      let dataStr = '';
+
+      for (const line of lines) {
+        if (line.startsWith('event: ')) {
+          eventType = line.slice(7).trim();
+        } else if (line.startsWith('data: ')) {
+          dataStr = line.slice(6).trim();
+        }
+      }
+
+      if (!dataStr) return;
+      let data = {};
+      try { data = JSON.parse(dataStr); } catch (_) {}
+
+      const elapsed = Math.round(performance.now() - startTime);
+
+      switch (eventType) {
+        case 'search.started':
+          showWorkingStatus('Working…');
+          captionText.innerText = `Searching local index for "${query}"`;
+          break;
+
+        case 'search.classified':
+          document.getElementById('step1').className = 'step done';
+          document.getElementById('step1').querySelector('.step-bubble').innerText = '✓';
+          document.getElementById('step2').className = 'step working';
+
+          // Entity badge handling
+          let tagHtml = '';
+          const qClass = data.query_class || '';
+          if (qClass.includes('WalletAddress')) {
+            const net = qClass.includes('TRON') ? 'TRON' : qClass.includes('Ethereum') ? 'Ethereum' : 'Solana';
+            const cls = net.toLowerCase();
+            tagHtml = `<span class="entity-tag ${cls}">✦ ${net} Wallet</span>`;
+          } else if (qClass.includes('BlockchainName')) {
+            tagHtml = `<span class="entity-tag tron">✦ Blockchain: ${data.detected_entity || 'Network'}</span>`;
+          } else if (qClass.includes('TokenTicker')) {
+            tagHtml = `<span class="entity-tag token">✦ Token: ${data.detected_entity || 'Ticker'}</span>`;
+          }
+          entityTagSlot.innerHTML = tagHtml;
+          document.getElementById('step1Desc').innerText = `Classified as ${qClass} (${Math.round((data.confidence||0.9)*100)}% conf)`;
+          break;
+
+        case 'search.index_lookup':
+          document.getElementById('step2Desc').innerText = `Lookup against ${data.docs_indexed || 6} indexed files`;
+          break;
+
+        case 'search.matches_found':
+          document.getElementById('step2').className = 'step done';
+          document.getElementById('step2').querySelector('.step-bubble').innerText = '✓';
+          document.getElementById('step3').className = 'step working';
+          hitsVal.innerText = data.count || 0;
+          break;
+
+        case 'search.verification':
+          if (!firstVerifiedTime) {
+            firstVerifiedTime = elapsed;
+            ttfvVal.innerText = `${firstVerifiedTime}ms`;
+          }
+          document.getElementById('step3Desc').innerText = `Verified in ${data.first_verified_file || 'scope'}`;
+          break;
+
+        case 'search.ranking':
+          document.getElementById('step3').className = 'step done';
+          document.getElementById('step3').querySelector('.step-bubble').innerText = '✓';
+          document.getElementById('step4').className = 'step working';
+          break;
+
+        case 'search.results':
+          if (Array.isArray(data.results)) {
+            for (const item of data.results) {
+              resultsMap.set(item.id || item.file_path, item);
+            }
+            renderResults(Array.from(resultsMap.values()), query);
+          }
+          break;
+
+        case 'search.empty':
+          statusBadge.className = 'status-badge empty';
+          statusBadge.innerHTML = '<span>No results found</span>';
+          captionText.innerText = 'Zero matching candidates in indexed codebase';
+          streamPill.innerText = 'Search complete';
+          resultsList.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-icon">📭</div>
+              <p>No results found for "<strong>${escapeHtml(query)}</strong>"</p>
+              <p style="font-size: 12px; margin-top: 4px; color: var(--text-muted);">Try a different keyword or identifier.</p>
+            </div>
+          `;
+          break;
+
+        case 'search.completed':
+          document.getElementById('step4').className = 'step done';
+          document.getElementById('step4').querySelector('.step-bubble').innerText = '✓';
+
+          statusBadge.className = 'status-badge ready';
+          statusBadge.innerHTML = '<span>✓ Results ready</span>';
+          const micros = data.elapsed_micros || (elapsed * 1000);
+          totalVal.innerText = micros < 1000 ? `${micros}µs` : `${(micros/1000).toFixed(1)}ms`;
+          captionText.innerText = `Search complete in ${micros < 1000 ? micros + 'µs' : (micros/1000).toFixed(2) + 'ms'}`;
+          streamPill.innerText = 'Search complete';
+          streamPill.style.color = 'var(--text-muted)';
+          streamPill.style.borderColor = 'var(--border-subtle)';
+          break;
+      }
+    }
+
+    function renderResults(items, query) {
+      if (items.length === 0) return;
+      hitsVal.innerText = items.length;
+
+      let html = '';
+      for (const item of items) {
+        const title = escapeHtml(item.title || item.file_path);
+        const path = escapeHtml(item.file_path || '');
+        const line = item.line_number ? `Line ${item.line_number}` : '';
+        const layer = escapeHtml(item.retrieval_layer || 'trigram');
+        const score = item.score ? `${Math.round(item.score * 100)}% match` : 'Verified';
+        const snippet = highlightQuery(escapeHtml(item.snippet || ''), query);
+        const timeStr = item.timestamp_us ? `+${item.timestamp_us}µs` : (item.timestamp_ms ? `+${item.timestamp_ms}ms` : '');
+
+        html += `
+          <div class="result-card">
+            <div class="res-top">
+              <div class="file-ref">
+                <span>📄</span>
+                <span>${path}</span>
+                <span style="color: var(--text-muted); font-size: 11px;">${line}</span>
+              </div>
+              <div class="badge-group">
+                <span class="layer-badge">${layer}</span>
+                <span class="score-badge">${score}</span>
+              </div>
+            </div>
+            <div class="res-title">${title}</div>
+            <pre class="code-block"><code>${snippet}</code></pre>
+            <div class="res-foot">
+              <span>✓ Verified AST Scope</span>
+              <span>Streamed at ${timeStr}</span>
+            </div>
+          </div>
+        `;
+      }
+      resultsList.innerHTML = html;
+    }
+
+    function highlightQuery(text, query) {
+      if (!query || query.length < 1) return text;
+      const terms = query.split(/\s+/).filter(t => t.length > 0);
+      if (terms.length === 0) return text;
+
+      let out = text;
+      for (const term of terms) {
+        const esc = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const re = new RegExp(`(${esc})`, 'gi');
+        out = out.replace(re, '<mark>$1</mark>');
+      }
+      return out;
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>

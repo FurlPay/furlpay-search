@@ -1,0 +1,23 @@
+[package]
+name = "furlpay-daemon"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "The resident daemon (furlpayd) — file watching, index lifecycle, IPC dispatch"
+
+[[bin]]
+name = "furlpayd"
+path = "src/main.rs"
+
+[dependencies]
+furlpay-core = { path = "../furlpay-core" }
+furlpay-simd = { path = "../furlpay-simd" }
+furlpay-ipc = { path = "../furlpay-ipc" }
+furlpay-web = { path = "../furlpay-web" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }

@@ -1,0 +1,24 @@
+[package]
+name = "furlpay-ipc"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Zero-copy shared-memory SPSC ring buffer for daemon-client IPC"
+
+[dependencies]
+furlpay-core = { path = "../furlpay-core" }
+tracing = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+criterion = { workspace = true }
+
+[[bench]]
+name = "ring_buffer_bench"
+harness = false
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.59", features = ["Win32_System_Memory", "Win32_Foundation", "Win32_Security"] }

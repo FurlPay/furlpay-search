@@ -1,0 +1,48 @@
+[package]
+name = "furlpay-eval"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Benchmark suite, MRR evaluation, and OpenTelemetry telemetry for FurlPay"
+default-run = "furlpay-eval"
+
+[[bin]]
+name = "furlpay-eval"
+path = "src/main.rs"
+
+[[bin]]
+name = "mrr_eval"
+path = "src/mrr_eval.rs"
+
+[[bench]]
+name = "code_search_bench"
+harness = false
+
+[[bench]]
+name = "intersection_bench"
+harness = false
+
+[[bench]]
+name = "ipc_bench"
+harness = false
+
+[[bench]]
+name = "ranking_bench"
+harness = false
+
+[[bench]]
+name = "streaming_bench"
+harness = false
+
+[dependencies]
+furlpay-core = { path = "../furlpay-core" }
+furlpay-simd = { path = "../furlpay-simd" }
+furlpay-ipc = { path = "../furlpay-ipc" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+anyhow = { workspace = true }
+
+[dev-dependencies]
+criterion = { workspace = true }

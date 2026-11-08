@@ -1,0 +1,46 @@
+[package]
+name = "furlpay-web"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Unified web retrieval engine: HTTP fetch, content extraction, search providers, browser rendering, and SSRF protection"
+
+[dependencies]
+furlpay-core = { path = "../furlpay-core" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+
+# HTTP client with native TLS
+reqwest = { version = "0.12", features = ["json", "stream", "gzip", "brotli", "deflate", "rustls-tls"], default-features = false }
+
+# HTML parsing
+scraper = "0.22"
+
+# URL normalization
+url = "2"
+
+# PDF text extraction
+pdf-extract = "0.7"
+
+# DNS resolution
+hickory-resolver = "0.25"
+
+# Byte handling and streaming
+bytes = "1"
+futures = "0.3"
+
+# Regex for text extraction
+regex = "1"
+
+# Time
+chrono = { version = "0.4", features = ["serde"] }
+
+# Unique IDs
+uuid = { version = "1", features = ["v4"] }
+
+# Fast non-cryptographic hashing
+xxhash-rust = { workspace = true, features = ["xxh3"] }

@@ -1,0 +1,24 @@
+{
+  "timestamp_utc": "2026-11-08T16:15:00Z",
+  "commit_hash": "head",
+  "environment": {
+    "os": "windows",
+    "arch": "x86_64",
+    "rustc_version": "rustc 1.98.1",
+    "cpu_simd": "x86-64 AVX2 (256-bit)"
+  },
+  "quality": {
+    "total_queries": 5,
+    "mrr": 1.0,
+    "target_mrr": 0.435,
+    "precision_at_1": 1.0,
+    "recall_at_10": 1.0,
+    "mrr_passed": true
+  },
+  "performance_targets": {
+    "p50_target_us": 268,
+    "p95_target_us": 395,
+    "p99_target_us": 489,
+    "mrr_target": 0.435
+  }
+}

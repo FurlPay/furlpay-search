@@ -1,0 +1,58 @@
+[
+  {
+    "id": "q1",
+    "category": "exact",
+    "query": "authenticationMiddleware",
+    "expected_file": "auth/middleware.ts",
+    "description": "Find exact authentication middleware function"
+  },
+  {
+    "id": "q2",
+    "category": "exact",
+    "query": "verifyJwtToken",
+    "expected_file": "auth/jwt.ts",
+    "description": "Find exact JWT verification function"
+  },
+  {
+    "id": "q3",
+    "category": "symbol",
+    "query": "fn process_transfer",
+    "expected_file": "payment/service.rs",
+    "description": "Find function definition for transfer processing"
+  },
+  {
+    "id": "q4",
+    "category": "symbol",
+    "query": "struct PaymentService",
+    "expected_file": "payment/service.rs",
+    "description": "Find struct definition for PaymentService"
+  },
+  {
+    "id": "q5",
+    "category": "regex",
+    "query": "auth.*middleware",
+    "expected_file": "auth/middleware.ts",
+    "description": "Regex pattern matching authentication middleware"
+  },
+  {
+    "id": "q6",
+    "category": "call_graph",
+    "query": "who calls initiateTransfer",
+    "expected_file": "payment/service.rs",
+    "description": "Call hierarchy traversal for payment initiation"
+  },
+  {
+    "id": "q7",
+    "category": "semantic",
+    "query": "JWT refresh token expiration handling",
+    "expected_file": "auth/jwt.ts",
+    "description": "Natural language query for token expiration logic"
+  },
+  {
+    "id": "q8",
+    "category": "hybrid",
+    "query": "authentication middleware security validation token",
+    "expected_file": "auth/middleware.ts",
+    "description": "Multi-token hybrid query combining exact keywords and concepts"
+  }
+]

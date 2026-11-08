@@ -1,0 +1,26 @@
+[package]
+name = "furlpay-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Core indexing, data structures, AST graph, query routing, and RRF ranking for FurlPay"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+arc-swap = { workspace = true }
+xxhash-rust = { workspace = true }
+tantivy = { workspace = true }
+tree-sitter = { workspace = true }
+memmap2 = { workspace = true }
+tracing = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+regex = "1"
+
+[dev-dependencies]
+criterion = { workspace = true }
+
+[[bench]]
+name = "search_bench"
+harness = false
